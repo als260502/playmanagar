@@ -1,0 +1,11 @@
+{
+    "name": "André",
+    "autoload":
+            {
+                "psr-4":
+                        {
+                            "App\\": "NpInformatica/App",
+                            "Core\\": "Core"
+                        }
+            }
+}
