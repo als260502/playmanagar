@@ -16,7 +16,6 @@ class Select implements IFind
     private $conn;
     private $container;
     private $table;
-    private $query;
     private $result;
 
     public function __construct(Factory $container, $table)
@@ -28,43 +27,36 @@ class Select implements IFind
 
     }
 
-    public function FindAll()
+    public function FindAll(string $query)
     {
 
         try {
-            $this->query = $this->StringQuery();
-            $this->result = $this->PrepareStatement($this->query);
-
+            $this->result = $this->PrepareStatement($query, []);
             return $this->result;
 
         } catch (\PDOException $e) {
-            print $e->getMessage();
+            throw  new \Exception($e->getMessage());
         }
-
 
     }
 
-    public function FindById($id)
+    public function FindByParams(string $query, array $params)
     {
+
         try {
-
-            $query = $this->StringQuery('', ['id' => $id]);
-
-            $this->result = $this->PrepareStatement($query , ['id' => $id]);
+            $this->result = $this->PrepareStatement($query, $params);
             return $this->result;
+
         } catch (\PDOException $e) {
-            print $e->getMessage();
+            throw  new \Exception($e->getMessage());
         }
+
     }
+
 
     public function GetContainer()
     {
         return $this->container;
-    }
-
-    public function findBy(array $param)
-    {
-
     }
 
     public function GetConnection()
@@ -72,73 +64,19 @@ class Select implements IFind
         return $this->conn;
     }
 
-    public function PrepareStatement(string $query, array $fields = null)
+    private function PrepareStatement(string $query, array $fields = [])
     {
         try {
             $stmt = $this->GetConnection()->prepare($query);
 
-            if (isset($fields)) {
+            $stmt->execute($fields);
+            $result =(empty($fields))? $stmt->fetchAll() : $stmt->fetch();
+            return $result;
 
-                foreach ($fields as $key => $value) {
-                    $stmt->bindValue(":{$key}", $value);
-                }
-
-                $stmt->execute();
-                $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                return $result;
-
-            } else {
-
-                $stmt->execute();
-                $result = $stmt->fetchAll(\PDO::FETCH_ASSOC);
-                return $result;
-            }
         } catch (\PDOException $e) {
             print "{$e->getMessage()} / {$e->getTraceAsString()}";
         }
 
     }
 
-    public function StringQuery(string $query = null, array $fields = null): string
-    {
-
-        if (isset($fields)) {
-            $this->query = sprintf("SELECT %s from %s WHERE %s", $this->PrepareRowsName($fields), $this->table, $this->PrepareFieldsName($fields));
-
-        } else {
-            $this->query = sprintf("SELECT * from %s", $this->table);
-
-        }
-
-        return $this->query;
-    }
-
-    public function PrepareFieldsName(array $fields): string
-    {
-        foreach ($fields as $key => $value) {
-            $queryString[] = "{$key}=:{$key}";
-        }
-        $strQuery = implode(',', $queryString);
-
-        return $strQuery;
-    }
-
-    public function PrepareFieldsValue(array $fields): array
-    {
-        foreach ($fields as $key => $value) {
-            $queryString[] = "{$value}";
-        }
-
-        return $queryString;
-    }
-
-    public function PrepareRowsName(array $fields): string
-    {
-        foreach ($fields as $key => $value) {
-            $queryString[] = "{$key}";
-        }
-        $strQuery = implode(',', $queryString);
-
-        return $strQuery;
-    }
 }

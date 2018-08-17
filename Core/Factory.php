@@ -19,6 +19,7 @@ class Factory {
                 $conn = new \App\DAO\Connection(new \App\DAO\SqliteConnection);
                 return $conn->GetConnection();
             });
+
         } catch (\PDOException $e) {
             print ("este container nao existe ou nao foi inicializado: {$e->getMessage()}, $e->errorInfo");
         }

@@ -15,11 +15,12 @@ use Core\Factory;
  * @author Andre
  */
 interface ICrud {
-     
+
+    public function __construct(Factory $container, $tableName);
+
     public function GetContainer();
     public function GetConnection();
-    public function PrepareStatement(string $query);
-    public function StringQuery(string $query = null, array $fields = null):string;
+
 
 }
 

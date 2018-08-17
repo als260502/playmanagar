@@ -14,8 +14,7 @@ namespace App\DAO\Find;
  */
 interface ISelect {
 
-    public function FindAll();
-    public function FindById($id);
-    public function FindBy(array $param);
-    
+    public function FindByParams(string $query, array $params);
+    public function FindAll(string $query);
+
 }

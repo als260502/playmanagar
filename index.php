@@ -5,7 +5,8 @@ require_once './vendor/autoload.php';
 $conn = new \Core\Factory();
 $slt = new \App\DAO\Find\Select($conn, 'user');
 
-$result = $slt->FindById(2);
+$res = $slt->FindAll("Select id from user");
+$result = $slt->FindByParams("Select name from user where id=?", ["2"]);
 
 
 var_dump($result);
